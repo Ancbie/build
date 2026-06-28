@@ -12,8 +12,8 @@ class Builder:
                              'libwebkitgtk-6.0-dev', "make", 'meson']
         self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui"]
 
-    def execute(self, command: list) -> int:
-        ret = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    def execute(self, command: list, working_dir:str|None=None) -> int:
+        ret = subprocess.Popen(command, cwd=working_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         return ret.returncode
 
     def launch(self):
@@ -39,30 +39,27 @@ class Builder:
     def build_wolfssl(self):
         assert which("autoreconf"), "autoreconf missing"
         pwd = os.getcwd()
+        working_path = os.path.realpath("wolfssl")
+        self.execute(['autoreconf', '-i'], working_dir=working_path)
         os.chdir('wolfssl')
-        self.execute(['autoreconf', '-i'])
         self.execute(["./configure", "--enable-shared", "--disable-opensslall", "--disable-opensslextra", "--enable-aescbc-length-checks", "--enable-curve25519", "--enable-ed25519", "--enable-ed25519-stream", "--enable-oldtls","--enable-base64encode","--enable-tlsx","--enable-scrypt", "--disable-examples", "--enable-crl", "--enable-jni", "--enable-sessioncerts"])
-        self.execute(['make'])
-        self.execute(['pkexec', 'make', 'install'])
         os.chdir(pwd)
+        self.execute(['make'], working_dir=working_path)
+        self.execute(['pkexec', 'make', 'install'], working_dir=working_path)
     def build_meson_projects(self):
         for i in ['atl', "bionic", 'libopensles']:
             self.build_meson(i)
     def build_meson(self, project_name:str):
-        pwd = os.getcwd()
-        os.chdir(project_name)
-        self.execute(["meson", "setup", "builddir"])
-        os.chdir("bionic/builddir")
-        self.execute(['meson', 'compile'])
-        self.execute(['pkexec','meson', 'install'])
-        os.chdir(pwd)
+        working_path = os.path.realpath(project_name)
+        self.execute(["meson", "setup", "builddir"], working_dir=working_path)
+        working_path = os.path.realpath(os.path.join(working_path, 'builddir'))
+        self.execute(['meson', 'compile'], working_dir=working_path)
+        self.execute(['pkexec','meson', 'install'], working_dir=working_path)
 
     def build_art(self):
-        pwd = os.getcwd()
-        os.chdir('art')
-        self.execute(['make', "____LIBDIR=lib"])
-        self.execute(["pkexec",'make', "____LIBDIR=lib", "install"])
-        os.chdir(pwd)
+        working_path = os.path.realpath('art')
+        self.execute(['make', "____LIBDIR=lib"], working_dir=working_path)
+        self.execute(["pkexec",'make', "____LIBDIR=lib", "install"], working_dir=working_path)
 
 if __name__ == "__main__":
     builder = Builder()
