@@ -21,6 +21,7 @@ class Builder:
             os.chdir(pwd)
             return ret
         ret = subprocess.Popen(command, cwd=working_dir, stderr=subprocess.STDOUT, shell=shell)
+        ret.wait()
         assert ret.returncode == 0, f'Run {command} failed.'
         return ret.returncode
 
