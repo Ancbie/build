@@ -22,7 +22,7 @@ class Builder:
             try:
                 f()
             except Exception as e:
-                print(f"\033[31m [Failed] {f.__name__}: {e} \033[0m")
+                print(f"\033[31m[Failed] {f.__name__}: {e} \033[0m")
                 break
 
     def install_packages(self):
