@@ -25,7 +25,7 @@ class Builder:
         return ret.returncode
 
     def launch(self):
-        for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_art, ]:
+        for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_art, self.build_meson_projects]:
             try:
                 f()
             except Exception as e:
