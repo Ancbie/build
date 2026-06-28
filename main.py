@@ -13,6 +13,7 @@ class Builder:
         self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui"]
 
     def execute(self, command: list, working_dir:str|None=None, shell:bool=False) -> int:
+        print(f"\033[32m[Exec] {command}\033[0m")
         if command[0] == 'sudo':
             pwd = os.getcwd()
             if working_dir:
@@ -28,7 +29,7 @@ class Builder:
     def launch(self):
         for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_art, self.build_meson_projects]:
             try:
-                print(f"\033[33m[Running] {f.__name__}\033[0m")
+                print(f"\033[32m[Run] {f.__name__}\033[0m")
                 f()
             except Exception as e:
                 print(f"\033[31m[Failed] {f.__name__}: {e}\033[0m")
