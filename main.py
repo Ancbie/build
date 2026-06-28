@@ -26,8 +26,8 @@ class Builder:
         if os.getuid() == 0:
             self.execute(['apt', 'install', *self.apt_packages])
         else:
-            assert shutil.which("sudo"), "sudo missing."
-            self.execute(["sudo", 'apt', 'install', *self.apt_packages])
+            assert shutil.which("pkexec"), "pkexec missing."
+            self.execute(["pkexec", 'apt', 'install', *self.apt_packages])
 
 
 if __name__ == "__main__":
