@@ -14,7 +14,7 @@ check_python3 (){
     echo "Failed to install required python packages."
     all_done=1
   fi
-  if [ "$all_done" != 0];then
+  if [ "$all_done" != 0 ];then
     echo "[Error]Something went wrong!"
   else
     echo "[3/3]All Done!"
