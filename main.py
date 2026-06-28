@@ -14,7 +14,11 @@ class Builder:
 
     def execute(self, command: list, working_dir:str|None=None, shell:bool=False) -> int:
         if command[0] == 'sudo':
-            return os.system(f"pkexec {command[1]} "+" ".join(command[2:]))
+            pwd = os.getcwd()
+            os.chdir(working_dir)
+            ret = os.system(f"pkexec {command[1]} "+" ".join(command[2:]))
+            os.chdir(pwd)
+            return ret
         ret = subprocess.Popen(command, cwd=working_dir, stderr=subprocess.STDOUT, shell=shell)
         assert ret.returncode == 0, f'Run {command} failed.'
         return ret.returncode
