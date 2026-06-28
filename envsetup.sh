@@ -9,7 +9,7 @@ check_python3 (){
     all_done=$?
   fi
   echo "[2/3]Install Required Packages."
-  $python3 -m pip install -r requirements.txt --break-system-packages
+  $python3 -m pip install -r $(pwd)/build/requirements.txt --break-system-packages
   if [ "$?" != "0" ];then
     echo "Failed to install required python packages."
     all_done=1
