@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+_check_passwd=0
+python3=$(which python3)
 check_python3 (){
-  python3=$(which python3)
   all_done=0
   echo "[1/3]Checking Python3."
   if [ -z "$python3" ]; then
@@ -19,5 +20,12 @@ check_python3 (){
   else
     echo "[3/3]All Done!"
   fi
+  _check_passwd=$all_done
+}
+m() {
+  if [ "$_check_passwd" == "0" ]; then
+    $python3 $(pwd)/build/main.py
+  fi
 }
 check_python3
+echo "Type 'm' to launch build."
