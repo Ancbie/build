@@ -28,9 +28,10 @@ class Builder:
     def launch(self):
         for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_art, self.build_meson_projects]:
             try:
+                print(f"\033[33m[Running] {f.__name__}\033[0m")
                 f()
             except Exception as e:
-                print(f"\033[31m[Failed] {f.__name__}: {e} \033[0m")
+                print(f"\033[31m[Failed] {f.__name__}: {e}\033[0m")
                 break
 
     def install_packages(self):
