@@ -2,6 +2,7 @@
 import os
 import shutil
 import subprocess
+from shutil import which
 
 
 class Builder:
@@ -9,13 +10,14 @@ class Builder:
         self.apt_packages = ['libasound2-dev', 'libavcodec-dev', 'libcap-dev', 'libdrm-dev', 'libglib2.0-dev',
                              'libgtk-4-dev', 'libgudev-1.0-dev', 'libopenxr-dev', 'libportal-dev', 'libsqlite3-dev',
                              'libwebkitgtk-6.0-dev']
+        self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui", "make", "meson"]
 
     def execute(self, command: list) -> int:
         ret = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         return ret.returncode
 
     def launch(self):
-        for f in [self.install_packages]:
+        for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_bionic]:
             try:
                 f()
             except Exception as e:
@@ -29,6 +31,27 @@ class Builder:
             assert shutil.which("pkexec"), "pkexec missing."
             self.execute(["pkexec", 'apt', 'install', *self.apt_packages])
 
+    def check_source_code(self):
+        for i in self.source_dirs:
+            assert os.path.exists(i), "%s is not exist." % i
+
+    def build_wolfssl(self):
+        assert which("autoreconf"), "autoreconf missing"
+        pwd = os.getcwd()
+        os.chdir('wolfssl')
+        self.execute(['autoreconf', '-i'])
+        self.execute(["./configure", "--enable-shared", "--disable-opensslall", "--disable-opensslextra", "--enable-aescbc-length-checks", "--enable-curve25519", "--enable-ed25519", "--enable-ed25519-stream", "--enable-oldtls","--enable-base64encode","--enable-tlsx","--enable-scrypt", "--disable-examples", "--enable-crl", "--enable-jni", "--enable-sessioncerts"])
+        self.execute(['make'])
+        self.execute(['pkexec', 'make', 'install'])
+        os.chdir(pwd)
+    def build_bionic(self):
+        pwd = os.getcwd()
+        os.chdir('bionic')
+        self.execute(["meson", "setup", "builddir"])
+        os.chdir("bionic/builddir")
+        self.execute(['meson', 'compile'])
+        self.execute(['pkexec','meson', 'install'])
+        os.chdir(pwd)
 
 if __name__ == "__main__":
     builder = Builder()
