@@ -17,7 +17,7 @@ class Builder:
         return ret.returncode
 
     def launch(self):
-        for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_bionic]:
+        for f in [self.install_packages, self.check_source_code, self.build_wolfssl, self.build_art, ]:
             try:
                 f()
             except Exception as e:
@@ -44,13 +44,23 @@ class Builder:
         self.execute(['make'])
         self.execute(['pkexec', 'make', 'install'])
         os.chdir(pwd)
-    def build_bionic(self):
+    def build_meson_projects(self):
+        for i in ['atl', "bionic", 'libopensles']:
+            self.build_meson(i)
+    def build_meson(self, project_name:str):
         pwd = os.getcwd()
-        os.chdir('bionic')
+        os.chdir(project_name)
         self.execute(["meson", "setup", "builddir"])
         os.chdir("bionic/builddir")
         self.execute(['meson', 'compile'])
         self.execute(['pkexec','meson', 'install'])
+        os.chdir(pwd)
+
+    def build_art(self):
+        pwd = os.getcwd()
+        os.chdir('art')
+        self.execute(['make', "____LIBDIR=lib"])
+        self.execute(["pkexec",'make', "____LIBDIR=lib", "install"])
         os.chdir(pwd)
 
 if __name__ == "__main__":
