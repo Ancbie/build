@@ -12,8 +12,10 @@ class Builder:
                              'libwebkitgtk-6.0-dev', "make", 'meson']
         self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui"]
 
-    def execute(self, command: list, working_dir:str|None=None) -> int:
-        ret = subprocess.Popen(command, cwd=working_dir, stderr=subprocess.STDOUT)
+    def execute(self, command: list, working_dir:str|None=None, shell:bool=False) -> int:
+        if command[0] == 'pkexec':
+            shell = True
+        ret = subprocess.Popen(command, cwd=working_dir, stderr=subprocess.STDOUT, shell=shell)
         assert ret.returncode == 0, f'Run {command} failed.'
         return ret.returncode
 
