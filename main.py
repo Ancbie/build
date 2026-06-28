@@ -14,6 +14,7 @@ class Builder:
 
     def execute(self, command: list, working_dir:str|None=None) -> int:
         ret = subprocess.Popen(command, cwd=working_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        assert ret.returncode == 0, f'Run {command} failed.'
         return ret.returncode
 
     def launch(self):
@@ -38,12 +39,9 @@ class Builder:
 
     def build_wolfssl(self):
         assert which("autoreconf"), "autoreconf missing"
-        pwd = os.getcwd()
         working_path = os.path.realpath("wolfssl")
         self.execute(['autoreconf', '-i'], working_dir=working_path)
-        os.chdir('wolfssl')
-        self.execute(["./configure", "--enable-shared", "--disable-opensslall", "--disable-opensslextra", "--enable-aescbc-length-checks", "--enable-curve25519", "--enable-ed25519", "--enable-ed25519-stream", "--enable-oldtls","--enable-base64encode","--enable-tlsx","--enable-scrypt", "--disable-examples", "--enable-crl", "--enable-jni", "--enable-sessioncerts"])
-        os.chdir(pwd)
+        self.execute(["sh","./configure", "--enable-shared", "--disable-opensslall", "--disable-opensslextra", "--enable-aescbc-length-checks", "--enable-curve25519", "--enable-ed25519", "--enable-ed25519-stream", "--enable-oldtls","--enable-base64encode","--enable-tlsx","--enable-scrypt", "--disable-examples", "--enable-crl", "--enable-jni", "--enable-sessioncerts"],working_dir=working_path)
         self.execute(['make'], working_dir=working_path)
         self.execute(['pkexec', 'make', 'install'], working_dir=working_path)
     def build_meson_projects(self):
