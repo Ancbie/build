@@ -13,7 +13,7 @@ class Builder:
         self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui"]
 
     def execute(self, command: list, working_dir:str|None=None) -> int:
-        ret = subprocess.Popen(command, cwd=working_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        ret = subprocess.Popen(command, cwd=working_dir, stderr=subprocess.STDOUT)
         assert ret.returncode == 0, f'Run {command} failed.'
         return ret.returncode
 
