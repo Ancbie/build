@@ -9,8 +9,8 @@ class Builder:
     def __init__(self):
         self.apt_packages = ['libasound2-dev', 'libavcodec-dev', 'libcap-dev', 'libdrm-dev', 'libglib2.0-dev',
                              'libgtk-4-dev', 'libgudev-1.0-dev', 'libopenxr-dev', 'libportal-dev', 'libsqlite3-dev',
-                             'libwebkitgtk-6.0-dev']
-        self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui", "make", "meson"]
+                             'libwebkitgtk-6.0-dev', "make", 'meson']
+        self.source_dirs = ["wolfssl", 'atl', 'art', "bionic", "libopensles", "atl-gui"]
 
     def execute(self, command: list) -> int:
         ret = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -22,6 +22,7 @@ class Builder:
                 f()
             except Exception as e:
                 print(f"\033[31m [Failed] {f.__name__}: {e} \033[0m")
+                break
 
     def install_packages(self):
         assert shutil.which("apt"), "apt is missing."
